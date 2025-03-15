@@ -1,4 +1,4 @@
-# 🕵️‍♂️ Bot Detector
+# 🥵 Bot Detector
 
 ## 📌 Overview
 This project aims to develop a **machine learning-based system** for detecting bots on the social media platform **X (formerly Twitter)**. Bots are automated accounts that mimic human behavior and can be used for malicious purposes, such as spreading misinformation, spamming, or manipulating public opinion. By leveraging numerical features (e.g., retweet counts, mention counts) and advanced machine learning techniques, this system identifies bot accounts with high accuracy.
@@ -11,11 +11,11 @@ This project aims to develop a **machine learning-based system** for detecting b
 ✔️ Detects bots based on **text patterns, posting behavior, and engagement metrics**.
 ✔️ Provides a **confidence score** indicating the likelihood of an account being a bot.
 ✔️ Generates structured outputs summarizing **bot classification results**.
-✔️ Supports **real-time analysis** of social media profiles.
+✔️ Supports **real-time analysis** of social media profiles using `snscrape`.
 
 ---
 
-## 📜 Acknowledgements
+## 🌝 Acknowledgements
 - 📊 [Twitter-Bot Detection Dataset](https://www.kaggle.com/datasets/goyaladi/twitter-bot-detection-dataset)
 
 ---
@@ -32,9 +32,8 @@ This project aims to develop a **machine learning-based system** for detecting b
 ## ⚙️ Installation
 
 ### 📌 Prerequisites
-- 🐍 Python **3.8+**
-- 🔑 Access to the **X API (Bearer Token required)**
-- 📦 Required libraries: `tweepy`, `pandas`, `numpy`, `scikit-learn`, `transformers`, `fasttext`, `joblib`
+- 🐖 Python **3.8+**
+- 📦 Required libraries: `snscrape`, `pandas`, `numpy`, `scikit-learn`, `transformers`, `fasttext`, `joblib`
 
 ### 🚀 Steps to Set Up
 1️⃣ **Clone the repository:**
@@ -46,20 +45,9 @@ This project aims to develop a **machine learning-based system** for detecting b
    ```bash
    pip install -r requirements.txt
    ```
-3️⃣ **Update API credentials:**
-   Create a `config.json` file in the root directory with your X API credentials:
-   ```json
-   {
-       "x": {
-           "bearer_token": "your_bearer_token_here"
-       }
-   }
-   ```
-   **⚠️ Note:** Ensure the token has **read-only access** to public data. If you encounter a `401 Unauthorized` error, verify that the token is valid and correctly configured.
-
-4️⃣ **Download pre-trained models and preprocessing objects:**
+3️⃣ **Download pre-trained models and preprocessing objects:**
    Place the following files in the `models/` directory:
-   - 📂 `distilbert_model/`
+   - 👤 `distilbert_model/`
    - 📂 `fasttext_model.bin`
    - 📂 `lgbm_model.pkl`
    - 📂 `tfidf_vectorizer.pkl`
@@ -69,10 +57,39 @@ This project aims to develop a **machine learning-based system** for detecting b
 
 ## 🚀 Usage
 
-### 🖥️ Backend API
-1️⃣ Start the backend server:
+### 🖥️ Data Extraction with `snscrape`
+Instead of using the X API, this project utilizes **snscrape** to fetch public data:
+```bash
+pip install snscrape
+```
+
+To scrape tweets from a specific user:
+```bash
+snscrape --jsonl --progress twitter-user example_user > data.json
+```
+
+To use it within Python:
+```python
+import snscrape.modules.twitter as sntwitter
+import pandas as pd
+
+def scrape_tweets(username, limit=100):
+    tweets = []
+    for tweet in sntwitter.TwitterUserScraper(username).get_items():
+        if len(tweets) >= limit:
+            break
+        tweets.append([tweet.date, tweet.content, tweet.likeCount, tweet.retweetCount])
+    return pd.DataFrame(tweets, columns=['Date', 'Content', 'Likes', 'Retweets'])
+
+# Example usage:
+data = scrape_tweets("example_user", 50)
+print(data.head())
+```
+
+### 🖥️ Running the System
+1️⃣ Start the main application (`main.py`):
    ```bash
-   uvicorn app:app --host 0.0.0.0 --port 8000
+   python main.py
    ```
 2️⃣ Test the `/detect-bot/` endpoint using Python:
    ```python
@@ -102,15 +119,15 @@ This project aims to develop a **machine learning-based system** for detecting b
 ---
 
 ## ⚠️ Important Notes
-📌 **API Rate Limits:** The X API imposes rate limits on the number of requests within a 15-minute window. If exceeded, you may encounter a `429 Too Many Requests` error. The system automatically retries after waiting for the rate limit reset.
-📌 **Invalid API Key:** If you see a `401 Unauthorized` error, ensure your API key in `config.json` is correct and has the necessary permissions.
-📌 **Waiting Time:** Due to rate limits, some requests may take longer to process. The system includes delays between requests to avoid hitting rate limits.
+📌 **snscrape Limitations:** Some users may have private or restricted accounts, which prevents scraping their data.
+📌 **Rate Limits:** Although `snscrape` does not impose strict rate limits, excessive requests may trigger platform restrictions.
+📌 **Data Accuracy:** The extracted data is dependent on the availability of public tweets and profile activity.
 
 ---
 
-## 🚀 Deployment(Optional)
-- 🌍 Deploy the backend API on a **cloud platform** (e.g., AWS, Azure, Heroku).
-- 🎛️ Host the **Streamlit frontend** locally or on **Streamlit Cloud**.
+## 🚀 Deployment (Optional)
+- 🌍 Deploy the system on a **cloud platform** (e.g., AWS, Azure, Heroku).
+- 🎮 Host the **Streamlit frontend** locally or on **Streamlit Cloud**.
 
 ---
 
@@ -122,10 +139,11 @@ This project aims to develop a **machine learning-based system** for detecting b
 
 ---
 
-## 📜 License
+## 💚 License
 This project is licensed under the **MIT License**. See the `LICENSE` file for details.
 
 ---
 
 ## 📩 Contact
 📧 For questions or feedback, contact: **codeitishant@gmail.com**
+
