@@ -1,0 +1,11 @@
+uvicorn
+transformers
+fasttext
+lightgbm
+scikit-learn
+numpy
+pandas
+requests
+tf-keras
+streamlit
+snscrape
