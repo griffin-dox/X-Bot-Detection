@@ -70,5 +70,18 @@ def predict_bot(features, bio):
     distilbert_pred = distilbert_model(inputs).logits.numpy()[0][1]
     fasttext_pred = float(fasttext_model.predict(bio)[0][0])
     lgbm_pred = lgbm_model.predict(features)[0]
-    confidence_score = 0.5 * distilbert_pred + 0.3 * fasttext_pred + 0.2 * lgbm_pred
-    return {"is_bot": confidence_score >= 0.5, "confidence_score": confidence_score}
+    
+    # Confidence-Based Model Selection
+    predictions = {
+        "DistilBERT": distilbert_pred,
+        "FastText": fasttext_pred,
+        "LightGBM": lgbm_pred
+    }
+    best_model = max(predictions, key=predictions.get)
+    best_confidence = predictions[best_model]
+    
+    if best_confidence > 0.85:
+        return {"is_bot": best_confidence >= 0.5, "confidence_score": best_confidence, "decision_by": best_model}
+    else:
+        final_confidence = (distilbert_pred + fasttext_pred + lgbm_pred) / 3
+        return {"is_bot": final_confidence >= 0.5, "confidence_score": final_confidence, "decision_by": "Average"}
